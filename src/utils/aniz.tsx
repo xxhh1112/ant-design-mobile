@@ -16,7 +16,7 @@ export const Animated: FC<{
   function paint() {
     const element = elementRef.current
     if (!element) return
-    element.style.transform = `translateX(${state.d * 10}px)`
+    element.style.transform = `translateX(${state.d * 5 + 100}px)`
     // element.innerText = state.d.toFixed(1)
   }
 
@@ -24,22 +24,26 @@ export const Animated: FC<{
     let id: number | null = null
     state.t = performance.now()
     function step(timestamp: number) {
-      if (Math.abs(state.target - state.d) < 0.1 && Math.abs(state.v) < 0.1) {
-        state.d = state.target
-        id = null
-        paint()
-        return
-      }
       const tDelta = (timestamp - state.t) / 1000
       const a = props.force(state.d, state.v)
-      // const nextV = state.v + a * tDelta
-      const nextV = (state.v + a * tDelta) * 0.99
-      state.d += state.v * tDelta
-      state.d += ((state.v + nextV) / 2) * tDelta
+      let nextV = state.v + a * tDelta
+      let nextD = state.d + ((state.v + nextV) / 2) * tDelta
+      const nextA = props.force(nextD, nextV)
+      nextV = state.v + ((a + nextA) / 2) * tDelta
+      nextD = state.d + ((state.v + nextV) / 2) * tDelta
+      // state.d += state.v * tDelta
+      state.d = nextD
+      if (Math.abs(state.d) < 0.5) {
+        console.log(tDelta, state.d, state.v)
+      }
       state.v = nextV
       state.t = timestamp
       paint()
-      id = window.requestAnimationFrame(step)
+      if (Math.abs(state.v) < 0.01 && Math.abs(a) < 0.01) {
+        id = null
+      } else {
+        id = window.requestAnimationFrame(step)
+      }
     }
     id = window.requestAnimationFrame(step)
     return () => {
@@ -48,5 +52,5 @@ export const Animated: FC<{
       }
     }
   }, [])
-  return <div ref={elementRef}>X</div>
+  return <div ref={elementRef}>{props.children}</div>
 }

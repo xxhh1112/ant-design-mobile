@@ -1,6 +1,7 @@
 # Space 间距
 
 <code src="./demos/demo1.tsx"></code>
+<code src="./demos/demo-aniz.tsx" debug></code>
 
 ### 属性
 
