@@ -4,7 +4,12 @@ import { toHaveNoViolations, axe } from 'jest-axe'
 import * as React from 'react'
 import { RunOptions } from 'axe-core'
 
+// @ts-ignore
+
+const { toMatchImageSnapshot } = require('jest-image-snapshot')
+
 expect.extend(toHaveNoViolations)
+expect.extend({ toMatchImageSnapshot })
 
 type UI = Parameters<typeof render>[0]
 
